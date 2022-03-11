@@ -1,0 +1,19 @@
+{
+  "generatorName": "kotlin",
+  "templateDir": "openapi-generator/templates",
+  "inputSpec": "openapi-generator/api.github.com.yaml",
+  "packageName": "io.github.gmvalentino8.github.sample.remote",
+  "apiPackage": "io.github.gmvalentino8.github.sample.remote.apis",
+  "modelPackage": "io.github.gmvalentino8.github.sample.remote.models",
+  "modelNameSuffix": "ApiModel",
+  "dateLibrary": "string",
+  "serializableModel": "true",
+  "serializationLibrary": "kotlinx_serialization",
+  "useCoroutines": "true",
+  "generateApiTests": "false",
+  "typeMappings": {
+    "array": "kotlin.collections.List",
+    "URI": "kotlin.String",
+    "java.math.BigDecimal": "kotlin.Double"
+  }
+}

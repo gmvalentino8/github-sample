@@ -1,0 +1,150 @@
+version: 2.1
+
+orbs:
+  android: circleci/android@1.0.3
+  codecov: codecov/codecov@3.2.2
+  
+references:
+  home: &home
+    /home/circleci
+  gem_cache_key: &gem_cache_key
+    key: bundle-{{ checksum "Gemfile.lock" }}
+  ssh_cache_key: &ssh_cache_key
+    key: ssh-{{ .Environment.CIRCLE_SHA1 }}
+
+commands:
+  gradle:
+    parameters:
+      title:
+        type: string
+      task:
+        type: string
+    steps:
+      - run:
+          name: <<parameters.title>>
+          # https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties
+          command: ./gradlew <<parameters.task>> --no-daemon --no-parallel -Dkotlin.compiler.execution.strategy=in-process -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"
+  danger:
+    description: Run Danger
+    parameters:
+      path:
+        type: string
+        description: Dangerfile
+        default: ./Dangerfile
+    steps:
+      - restore_cache:
+          <<: *gem_cache_key
+      - run:
+          name: bundle install
+          command: bundle install --path vendor/bundle --clean
+      - save_cache:
+          <<: *gem_cache_key
+          paths:
+            - vendor/bundle
+      - restore_cache:
+          <<: *ssh_cache_key
+      - run: bundle exec danger --dangerfile=<< parameters.path >> --danger_id=<< parameters.path >>
+  save_test_results:
+    description: Save test results
+    steps:
+      - run:
+          name: Merge test result
+          command: |
+            mkdir -p ~/test-results/junit/
+            find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/test-results/junit/ \;
+          when: always
+      - store_test_results:
+          path: ~/test-results
+
+jobs:
+  build_workspace:
+    executor:
+      name: android/android
+      sdk-version: '30'
+    steps:
+      - checkout
+      - android/restore-gradle-cache
+      - android/restore-build-cache
+      - gradle:
+          title: compile sources
+          task: compileDevDebugSources --stacktrace
+      - android/save-gradle-cache
+      - android/save-build-cache
+      - run:
+          name: Add github.com to known hosts
+          command: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - save_cache:
+          <<: *ssh_cache_key
+          paths:
+            - ~/.ssh
+      - persist_to_workspace:
+          root: *home
+          paths:
+            - ./project
+            - ./.gradle/cache
+            - ./.gradle/wrapper
+
+  check_lint:
+    executor:
+      name: android/android
+      sdk-version: '30'
+    steps:
+      - attach_workspace:
+          at: *home
+      - gradle:
+          title: lint
+          task: lintDevDebug
+      - gradle:
+          title: ktLint
+          task: ktlintCheck
+      - danger
+
+  unit_test:
+    executor:
+      name: android/android
+      sdk-version: '30'
+    steps:
+      - attach_workspace:
+          at: *home
+      - gradle:
+          title: unit test
+          task: testDevDebugUnitTest
+      - gradle:
+          title: code coverage
+          task: koverMergedXmlReport
+      - codecov/upload:
+          file: ./build/reports/kover/report.xml
+      - save_test_results
+
+  deploy:
+    executor:
+      name: android/android
+      sdk-version: '30'
+    steps:
+      - attach_workspace:
+          at: *home
+      - gradle:
+          title: Build DevDebug Apk
+          task: assembleDevDebug
+      - store_artifacts:
+          path: app/build/outputs/apk
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build_workspace
+      - check_lint:
+          requires:
+            - build_workspace
+      - unit_test:
+          requires:
+            - build_workspace
+      - deploy:
+          requires:
+            - unit_test
+          filters:
+            branches:
+              only:
+                - develop
+                - main

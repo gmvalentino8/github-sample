@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/root_nav_graph"
+        app:startDestination="@id/searchTop">
+
+    <fragment
+            android:id="@+id/searchTop"
+            android:name="io.github.gmvalentino8.github.sample.ui.features.search.top.SearchTopFragment"
+            android:label="SearchTop">
+        <action
+                android:id="@+id/action_searchTop_to_repoDetails"
+                app:destination="@id/repoDetails"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/action_searchTop_to_searchRepositoryResults"
+                app:destination="@id/searchRepositoryResults"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right"/>
+        <action
+                android:id="@+id/action_searchTop_to_searchIssueResults"
+                app:destination="@id/searchIssueResults"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right"/>
+        <action
+                android:id="@+id/action_searchTop_to_searchPullRequestResults"
+                app:destination="@id/searchPullRequestResults"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right"/>
+        <action
+                android:id="@+id/action_searchTop_to_searchUserResults"
+                app:destination="@id/searchUserResults"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right"/>
+        <action
+                android:id="@+id/action_searchTop_to_searchOrganizationResults"
+                app:destination="@id/searchOrganizationResults"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/searchRepositoryResults"
+            android:name="io.github.gmvalentino8.github.sample.ui.features.search.results.repository.SearchRepositoryResultsFragment"
+            android:label="SearchRepositoryResults">
+        <argument
+                android:name="searchText"
+                app:argType="string" />
+        <action
+                android:id="@+id/action_searchRepositoryResults_to_repoDetails"
+                app:destination="@id/repoDetails"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/searchIssueResults"
+            android:name="io.github.gmvalentino8.github.sample.ui.features.search.results.issue.SearchIssueResultsFragment"
+            android:label="SearchIssueResults">
+        <argument
+                android:name="searchText"
+                app:argType="string" />
+    </fragment>
+
+    <fragment
+            android:id="@+id/searchPullRequestResults"
+            android:name="io.github.gmvalentino8.github.sample.ui.features.search.results.pullrequest.SearchPullRequestResultsFragment"
+            android:label="SearchPullRequestResults">
+        <argument
+                android:name="searchText"
+                app:argType="string" />
+    </fragment>
+
+    <fragment
+            android:id="@+id/searchUserResults"
+            android:name="io.github.gmvalentino8.github.sample.ui.features.search.results.user.SearchUserResultsFragment"
+            android:label="SearchUserResults">
+        <argument
+                android:name="searchText"
+                app:argType="string" />
+    </fragment>
+
+    <fragment
+            android:id="@+id/searchOrganizationResults"
+            android:name="io.github.gmvalentino8.github.sample.ui.features.search.results.organization.SearchOrganizationResultsFragment"
+            android:label="SearchOrganizationResults">
+        <argument
+                android:name="searchText"
+                app:argType="string" />
+    </fragment>
+    
+    <fragment
+            android:id="@+id/repoDetails"
+            android:name="io.github.gmvalentino8.github.sample.ui.features.details.repo.RepoDetailsFragment"
+            android:label="RepoDetails">
+        <argument
+                android:name="repository"
+                app:argType="io.github.gmvalentino8.github.sample.domain.entities.Repository" />
+    </fragment>
+</navigation>
